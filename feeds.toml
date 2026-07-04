@@ -1,9 +1,13 @@
 # Your personal feed config. Edit freely — the script re-reads it every run.
 
-# Max items in the digest. Small on purpose: read it, be done.
-max_items = 18
-# Ignore anything older than this many hours.
+# Max items in the digest. Dense like Drudge, but still finite.
+max_items = 36
+# Ignore anything older than this many hours (a source can override this —
+# useful for feeds that post weekly).
 max_age_hours = 48
+# Diversity caps: no single feed or topic can hog the digest.
+max_per_source = 4
+max_per_topic = 8
 
 # Keywords that boost an item's score (case-insensitive substring match on title).
 # Add/remove to tune what floats to the top. Score bump per hit is 2.
@@ -51,6 +55,7 @@ name = "Data Engineering Weekly"
 url = "https://www.dataengineeringweekly.com/feed"
 topic = "programming"
 weight = 3
+max_age_hours = 168
 
 # ---------------------------------------------------------------- ai
 
@@ -147,7 +152,8 @@ weight = 1
 name = "Stronger by Science"
 url = "https://www.strongerbyscience.com/feed/"
 topic = "fitness"
-weight = 1
+weight = 2
+max_age_hours = 168
 
 # ---------------------------------------------------------------- music discovery
 
@@ -163,7 +169,8 @@ weight = 0
 name = "The Prog Report"
 url = "https://progreport.com/feed/"
 topic = "music"
-weight = 1
+weight = 2
+max_age_hours = 168
 
 # ---------------------------------------------------------------- ham radio
 
@@ -171,4 +178,5 @@ weight = 1
 name = "ARRL News"
 url = "http://www.arrl.org/news/rss"
 topic = "ham"
-weight = 1
+weight = 2
+max_age_hours = 168
