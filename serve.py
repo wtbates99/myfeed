@@ -9,6 +9,7 @@ Routes:
 """
 
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,8 +17,10 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 HERE = Path(__file__).parent
-CLICKS_LOG = HERE / "clicks.jsonl"
+DATA = Path(os.environ.get("MYFEED_DATA", HERE))
+CLICKS_LOG = DATA / "clicks.jsonl"
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8484
+BIND = os.environ.get("MYFEED_BIND", "127.0.0.1")
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -34,7 +37,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         url = urlparse(self.path)
         if url.path == "/":
-            f = HERE / "digest.html"
+            f = DATA / "digest.html"
             if f.exists():
                 self._send(200, f.read_bytes(), extra={"Cache-Control": "no-cache"})
             else:
@@ -58,7 +61,7 @@ class Handler(BaseHTTPRequestHandler):
         elif url.path == "/robots.txt":
             self._send(200, "User-agent: *\nDisallow: /\n", "text/plain")
         elif url.path == "/archive/":
-            files = sorted((HERE / "archive").glob("*.html"), reverse=True)
+            files = sorted((DATA / "archive").glob("*.html"), reverse=True)
             rows = "\n".join(f'<p><a href="/archive/{f.name}">{f.stem}</a></p>'
                              for f in files[:200])
             self._send(200, "<!doctype html><title>archive</title>"
@@ -66,7 +69,7 @@ class Handler(BaseHTTPRequestHandler):
                             f"margin:2rem auto'><h1>Past editions</h1>{rows}")
         elif url.path.startswith("/archive/"):
             name = Path(url.path).name  # basename only: no traversal
-            f = HERE / "archive" / name
+            f = DATA / "archive" / name
             if f.is_file() and f.suffix == ".html":
                 self._send(200, f.read_bytes())
             else:
@@ -79,5 +82,5 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"serving on :{PORT}")
-    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    print(f"serving on {BIND}:{PORT}")
+    ThreadingHTTPServer((BIND, PORT), Handler).serve_forever()

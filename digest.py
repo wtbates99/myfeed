@@ -16,6 +16,7 @@ import calendar
 import html
 import json
 import math
+import os
 import re
 import sys
 import tomllib
@@ -29,9 +30,12 @@ from pathlib import Path
 import feedparser
 
 HERE = Path(__file__).parent
+# state (logs, cache, output) lives in DATA so a container can mount a volume
+DATA = Path(os.environ.get("MYFEED_DATA", HERE))
+DATA.mkdir(parents=True, exist_ok=True)
 CONFIG = tomllib.loads((HERE / "feeds.toml").read_text())
-SHOWN_LOG = HERE / "shown.jsonl"
-CLICKS_LOG = HERE / "clicks.jsonl"
+SHOWN_LOG = DATA / "shown.jsonl"
+CLICKS_LOG = DATA / "clicks.jsonl"
 
 STOPWORDS = set("""this that with from have will your what when they them then
 were been more over which their there about after into just says said could
@@ -420,7 +424,7 @@ def main():
     paper = max(arxiv, key=lambda i: i["score"], default=None)
     if paper:
         items.remove(paper)
-    cache_file = HERE / "paper.json"
+    cache_file = DATA / "paper.json"
     cached = json.loads(cache_file.read_text()) if cache_file.exists() else None
     if cached:
         age_days = (datetime.now(timezone.utc)
@@ -449,10 +453,10 @@ def main():
                     "url": i["link"], "title": i["title"], "topic": i["topic"],
                 }) + "\n")
 
-    out = HERE / "digest.html"
+    out = DATA / "digest.html"
     page = render(picked, paper, web)
     out.write_text(page)
-    archive = HERE / "archive"
+    archive = DATA / "archive"
     archive.mkdir(exist_ok=True)
     (archive / datetime.now().strftime("%Y-%m-%d-%H%M.html")).write_text(page)
     print(f"Wrote {out} ({len(picked)} items from {len(items)} candidates)")
