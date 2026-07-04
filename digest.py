@@ -211,21 +211,26 @@ def render(picked, paper):
   @media (max-width: 40rem) {{ .cols {{ column-count: 1; }} }}
   .cols p {{ margin: 0 0 0.55rem; font-size: 1rem; line-height: 1.3;
              break-inside: avoid; }}
-  .cols a {{ color: #00e; }} .cols a:visited, .lead a:visited {{ color: purple; }}
+  .cols a {{ color: #00c; }} .cols a:visited, .lead a:visited {{ color: #529; }}
   @media (prefers-color-scheme: dark) {{ .cols a {{ color: #8ab4f8; }} }}
-  h2 {{ font-size: 0.8rem; letter-spacing: 0.15em; color: gray;
-        margin: 1.4rem 0 0.5rem; break-after: avoid; }}
+  h2 {{ font-size: 0.9rem; font-weight: bold; letter-spacing: 0.12em;
+        color: inherit; border-bottom: 2px solid currentColor;
+        padding-bottom: 0.15rem; margin: 1.4rem 0 0.5rem; break-after: avoid; }}
   h2:first-child {{ margin-top: 0; }}
-  .meta {{ font-size: 0.75rem; color: gray; }}
-  header {{ font-size: 0.8rem; letter-spacing: 0.3em; color: gray; }}
+  .meta {{ font-size: 0.75rem; color: #444; }}
+  header {{ font-size: 0.8rem; letter-spacing: 0.3em; color: #333; font-weight: bold; }}
+  @media (prefers-color-scheme: dark) {{
+    .meta {{ color: #bbb; }} header {{ color: #ddd; }}
+  }}
   .ticker {{ font-size: 0.85rem; margin-top: 0.4rem; }}
   .up {{ color: green; }} .down {{ color: #c00; }}
   @media (prefers-color-scheme: dark) {{ .up {{ color: #7c7; }} .down {{ color: #f88; }} }}
   .paper {{ border: 1px solid gray; max-width: 42rem; margin: 0 auto 1.5rem;
             padding: 0.6rem 1rem; font-size: 0.95rem; }}
   .paper a {{ color: inherit; }}
-  footer {{ margin: 2rem 0 1rem; color: gray; font-size: 0.85rem;
+  footer {{ margin: 2rem 0 1rem; color: #444; font-size: 0.85rem;
             border-top: 1px solid gray; padding-top: 1rem; }}
+  @media (prefers-color-scheme: dark) {{ footer {{ color: #bbb; }} }}
 </style></head><body>
 <header>THE DIGEST ··· {date} ··· GENERATED {stamp}</header>
 {ticker_html}

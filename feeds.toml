@@ -41,19 +41,19 @@ bury = [
 [[source]]
 name = "Hacker News (best)"
 url = "https://hnrss.org/best"
-topic = "programming"
+topic = "code & data engineering"
 weight = 3
 
 [[source]]
 name = "Lobsters"
 url = "https://lobste.rs/rss"
-topic = "programming"
+topic = "code & data engineering"
 weight = 2
 
 [[source]]
 name = "Data Engineering Weekly"
 url = "https://www.dataengineeringweekly.com/feed"
-topic = "programming"
+topic = "code & data engineering"
 weight = 3
 max_age_hours = 168
 
@@ -62,13 +62,13 @@ max_age_hours = 168
 [[source]]
 name = "Simon Willison"
 url = "https://simonwillison.net/atom/everything/"
-topic = "ai"
+topic = "ai & machine learning"
 weight = 3
 
 [[source]]
 name = "TechCrunch AI"
 url = "https://techcrunch.com/category/artificial-intelligence/feed/"
-topic = "ai"
+topic = "ai & machine learning"
 weight = 1
 
 # High volume, negative weight: only papers hitting your boost keywords
@@ -77,7 +77,7 @@ weight = 1
 [[source]]
 name = "arXiv cs.LG"
 url = "https://rss.arxiv.org/rss/cs.LG"
-topic = "ai"
+topic = "ai & machine learning"
 weight = -1
 max_age_hours = 168
 
@@ -86,25 +86,25 @@ max_age_hours = 168
 [[source]]
 name = "MarketWatch Top"
 url = "https://feeds.content.dowjones.io/public/rss/mw_topstories"
-topic = "finance"
+topic = "markets & economy"
 weight = 2
 
 [[source]]
 name = "Yahoo Finance"
 url = "https://finance.yahoo.com/news/rssindex"
-topic = "finance"
+topic = "markets & economy"
 weight = 1
 
 [[source]]
 name = "Marginal Revolution"
 url = "https://marginalrevolution.com/feed"
-topic = "finance"
+topic = "markets & economy"
 weight = 2
 
 [[source]]
 name = "Calculated Risk"
 url = "https://www.calculatedriskblog.com/feeds/posts/default"
-topic = "finance"
+topic = "markets & economy"
 weight = 2
 
 # ---------------------------------------------------------------- sports (Boston + leagues)
@@ -112,25 +112,25 @@ weight = 2
 [[source]]
 name = "ESPN MLB"
 url = "https://www.espn.com/espn/rss/mlb/news"
-topic = "sports"
+topic = "red sox · celtics · leagues"
 weight = 2
 
 [[source]]
 name = "ESPN NBA"
 url = "https://www.espn.com/espn/rss/nba/news"
-topic = "sports"
+topic = "red sox · celtics · leagues"
 weight = 2
 
 [[source]]
 name = "Over the Monster (Red Sox)"
 url = "https://www.overthemonster.com/rss/index.xml"
-topic = "sports"
+topic = "red sox · celtics · leagues"
 weight = 2
 
 [[source]]
 name = "CelticsBlog"
 url = "https://www.celticsblog.com/rss/index.xml"
-topic = "sports"
+topic = "red sox · celtics · leagues"
 weight = 2
 
 # ---------------------------------------------------------------- science / space
@@ -138,13 +138,13 @@ weight = 2
 [[source]]
 name = "Quanta Magazine"
 url = "https://www.quantamagazine.org/feed/"
-topic = "science"
+topic = "science & space"
 weight = 2
 
 [[source]]
 name = "Ars Technica"
 url = "https://feeds.arstechnica.com/arstechnica/index"
-topic = "science"
+topic = "science & space"
 weight = 1
 
 # ---------------------------------------------------------------- fitness (occasional highlights only)
@@ -152,7 +152,7 @@ weight = 1
 [[source]]
 name = "Stronger by Science"
 url = "https://www.strongerbyscience.com/feed/"
-topic = "fitness"
+topic = "lifting & running"
 weight = 2
 max_age_hours = 168
 
@@ -163,13 +163,13 @@ max_age_hours = 168
 [[source]]
 name = "Pitchfork"
 url = "https://pitchfork.com/feed/rss"
-topic = "music"
+topic = "music discovery"
 weight = 0
 
 [[source]]
 name = "The Prog Report"
 url = "https://progreport.com/feed/"
-topic = "music"
+topic = "music discovery"
 weight = 2
 max_age_hours = 168
 
@@ -178,6 +178,6 @@ max_age_hours = 168
 [[source]]
 name = "ARRL News"
 url = "http://www.arrl.org/news/rss"
-topic = "ham"
+topic = "ham radio"
 weight = 2
 max_age_hours = 168
