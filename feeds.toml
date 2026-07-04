@@ -72,13 +72,14 @@ topic = "ai"
 weight = 1
 
 # High volume, negative weight: only papers hitting your boost keywords
-# (forecast, time series, llm, agent...) will ever surface. Your
-# one-whitepaper-a-week candidates come from here.
+# (forecast, time series, llm, agent...) will ever surface in the columns.
+# The single best paper over the past week gets pinned as PAPER OF THE WEEK.
 [[source]]
 name = "arXiv cs.LG"
 url = "https://rss.arxiv.org/rss/cs.LG"
 topic = "ai"
 weight = -1
+max_age_hours = 168
 
 # ---------------------------------------------------------------- econ / markets
 

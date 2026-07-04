@@ -18,6 +18,39 @@ dependency (feedparser) inline.
 ./digest.py --no-open  # just write the file
 ```
 
+Besides the ranked links, the page carries a market ticker (S&P, Nasdaq,
+Dow, 10-yr, BTC via Yahoo's chart API), your teams' records and next games
+(ESPN's public API), and a pinned "paper of the week" — the best-scoring
+arXiv paper of the past 7 days, cached in `paper.json` since arXiv's RSS
+only carries each day's announcements. All of it degrades gracefully:
+if an API is down, that line just doesn't render.
+
+To keep it fresh without thinking about it, run it on a systemd user timer:
+
+```ini
+# ~/.config/systemd/user/myfeed.service
+[Unit]
+Description=Regenerate myfeed digest
+After=network-online.target
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/bin:/usr/bin:/bin
+ExecStart=%h/myfeed/digest.py --no-open
+
+# ~/.config/systemd/user/myfeed.timer
+[Unit]
+Description=Regenerate myfeed digest every 3 hours
+[Timer]
+OnCalendar=*-*-* 00/3:00:00
+Persistent=true
+[Install]
+WantedBy=timers.target
+```
+
+```sh
+systemctl --user daemon-reload && systemctl --user enable --now myfeed.timer
+```
+
 ## How it works
 
 Everything lives in `feeds.toml`:
