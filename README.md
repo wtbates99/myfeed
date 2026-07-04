@@ -25,7 +25,18 @@ arXiv paper of the past 7 days, cached in `paper.json` since arXiv's RSS
 only carries each day's announcements. All of it degrades gracefully:
 if an API is down, that line just doesn't render.
 
-To keep it fresh without thinking about it, run it on a systemd user timer:
+## Deployment
+
+Production runs as a Docker container (see `Dockerfile` + `entrypoint.sh`):
+the entrypoint regenerates the digest every 3 hours and `serve.py` serves it,
+logging clicks to a mounted `/data` volume. Pushes to `main` build
+`ghcr.io/wtbates99/myfeed:latest` via GitHub Actions; watchtower redeploys it,
+and Cloudflare Tunnel routes news.palanbates.com to the container.
+
+`serve.py` routes: `/` the digest · `/go` click-logging redirect (feeds the
+learned ranker) · `/archive/` past editions · `/robots.txt` says go away.
+
+Alternatively, run it bare on a systemd user timer:
 
 ```ini
 # ~/.config/systemd/user/myfeed.service
