@@ -1,0 +1,174 @@
+# Your personal feed config. Edit freely — the script re-reads it every run.
+
+# Max items in the digest. Small on purpose: read it, be done.
+max_items = 18
+# Ignore anything older than this many hours.
+max_age_hours = 48
+
+# Keywords that boost an item's score (case-insensitive substring match on title).
+# Add/remove to tune what floats to the top. Score bump per hit is 2.
+boost = [
+  # your stack
+  "python", "snowflake", "dbt", "airflow", "azure", "postgres", "duckdb",
+  "polars", "data engineering", "power bi",
+  # ai — forecasting/agents/db-integration is the sweet spot
+  "forecast", "time series", "time-series", "llm", "claude", "anthropic",
+  "openai", "rag", "agent", "text-to-sql",
+  # econ/markets
+  "fed", "inflation", "rates", "earnings", "s&p", "gdp", "tariff", "jobs report",
+  # your teams
+  "red sox", "celtics",
+  # music you like
+  "prog", "kanye", "coheed",
+  # ham
+  "ham radio", "amateur radio",
+]
+
+# Keywords that bury an item (score -5 per hit). Kill clickbait/noise here.
+bury = [
+  "you won't believe", "sponsored", "deal of the day", "best deals",
+  "hands-on", "rumor",
+  "rates today", "best cd rates", "mortgage and refinance", "horoscope",
+  "power rankings", "fantasy", "betting", "odds", "parlay",
+]
+
+# ---------------------------------------------------------------- programming / data
+
+[[source]]
+name = "Hacker News (best)"
+url = "https://hnrss.org/best"
+topic = "programming"
+weight = 3
+
+[[source]]
+name = "Lobsters"
+url = "https://lobste.rs/rss"
+topic = "programming"
+weight = 2
+
+[[source]]
+name = "Data Engineering Weekly"
+url = "https://www.dataengineeringweekly.com/feed"
+topic = "programming"
+weight = 3
+
+# ---------------------------------------------------------------- ai
+
+[[source]]
+name = "Simon Willison"
+url = "https://simonwillison.net/atom/everything/"
+topic = "ai"
+weight = 3
+
+[[source]]
+name = "TechCrunch AI"
+url = "https://techcrunch.com/category/artificial-intelligence/feed/"
+topic = "ai"
+weight = 1
+
+# High volume, negative weight: only papers hitting your boost keywords
+# (forecast, time series, llm, agent...) will ever surface. Your
+# one-whitepaper-a-week candidates come from here.
+[[source]]
+name = "arXiv cs.LG"
+url = "https://rss.arxiv.org/rss/cs.LG"
+topic = "ai"
+weight = -1
+
+# ---------------------------------------------------------------- econ / markets
+
+[[source]]
+name = "MarketWatch Top"
+url = "https://feeds.content.dowjones.io/public/rss/mw_topstories"
+topic = "finance"
+weight = 2
+
+[[source]]
+name = "Yahoo Finance"
+url = "https://finance.yahoo.com/news/rssindex"
+topic = "finance"
+weight = 1
+
+[[source]]
+name = "Marginal Revolution"
+url = "https://marginalrevolution.com/feed"
+topic = "finance"
+weight = 2
+
+[[source]]
+name = "Calculated Risk"
+url = "https://www.calculatedriskblog.com/feeds/posts/default"
+topic = "finance"
+weight = 2
+
+# ---------------------------------------------------------------- sports (Boston + leagues)
+
+[[source]]
+name = "ESPN MLB"
+url = "https://www.espn.com/espn/rss/mlb/news"
+topic = "sports"
+weight = 2
+
+[[source]]
+name = "ESPN NBA"
+url = "https://www.espn.com/espn/rss/nba/news"
+topic = "sports"
+weight = 2
+
+[[source]]
+name = "Over the Monster (Red Sox)"
+url = "https://www.overthemonster.com/rss/index.xml"
+topic = "sports"
+weight = 2
+
+[[source]]
+name = "CelticsBlog"
+url = "https://www.celticsblog.com/rss/index.xml"
+topic = "sports"
+weight = 2
+
+# ---------------------------------------------------------------- science / space
+
+[[source]]
+name = "Quanta Magazine"
+url = "https://www.quantamagazine.org/feed/"
+topic = "science"
+weight = 2
+
+[[source]]
+name = "Ars Technica"
+url = "https://feeds.arstechnica.com/arstechnica/index"
+topic = "science"
+weight = 1
+
+# ---------------------------------------------------------------- fitness (occasional highlights only)
+
+[[source]]
+name = "Stronger by Science"
+url = "https://www.strongerbyscience.com/feed/"
+topic = "fitness"
+weight = 1
+
+# ---------------------------------------------------------------- music discovery
+
+# Full Pitchfork feed is noisy (and covers genres you skip), so weight 0:
+# items only surface when they hit a boost keyword (prog, kanye, coheed...).
+[[source]]
+name = "Pitchfork"
+url = "https://pitchfork.com/feed/rss"
+topic = "music"
+weight = 0
+
+[[source]]
+name = "The Prog Report"
+url = "https://progreport.com/feed/"
+topic = "music"
+weight = 1
+
+# ---------------------------------------------------------------- ham radio
+
+[[source]]
+name = "ARRL News"
+url = "http://www.arrl.org/news/rss"
+topic = "ham"
+weight = 1
