@@ -1,0 +1,66 @@
+[
+ {
+  "date": "2026-07-03",
+  "label": "Jobs report"
+ },
+ {
+  "date": "2026-07-14",
+  "label": "CPI (June)"
+ },
+ {
+  "date": "2026-07-29",
+  "label": "FOMC decision"
+ },
+ {
+  "date": "2026-08-07",
+  "label": "Jobs report"
+ },
+ {
+  "date": "2026-08-12",
+  "label": "CPI (July)"
+ },
+ {
+  "date": "2026-09-04",
+  "label": "Jobs report"
+ },
+ {
+  "date": "2026-09-11",
+  "label": "CPI (Aug)"
+ },
+ {
+  "date": "2026-09-16",
+  "label": "FOMC decision"
+ },
+ {
+  "date": "2026-10-02",
+  "label": "Jobs report"
+ },
+ {
+  "date": "2026-10-14",
+  "label": "CPI (Sep)"
+ },
+ {
+  "date": "2026-10-28",
+  "label": "FOMC decision"
+ },
+ {
+  "date": "2026-11-06",
+  "label": "Jobs report"
+ },
+ {
+  "date": "2026-11-10",
+  "label": "CPI (Oct)"
+ },
+ {
+  "date": "2026-12-04",
+  "label": "Jobs report"
+ },
+ {
+  "date": "2026-12-09",
+  "label": "FOMC decision"
+ },
+ {
+  "date": "2026-12-10",
+  "label": "CPI (Nov)"
+ }
+]

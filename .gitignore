@@ -1,3 +1,6 @@
 digest.html
 __pycache__/
 paper.json
+shown.jsonl
+clicks.jsonl
+archive/
