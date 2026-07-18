@@ -34,7 +34,8 @@ logging clicks to a mounted `/data` volume. Pushes to `main` build
 and Cloudflare Tunnel routes news.palanbates.com to the container.
 
 `serve.py` routes: `/` the digest · `/go` click-logging redirect (feeds the
-learned ranker) · `/archive/` past editions · `/robots.txt` says go away.
+learned ranker) · `/archive/` the five most recent editions · `/robots.txt`
+says go away. Digest generation prunes older archive pages to save disk space.
 
 Alternatively, run it bare on a systemd user timer:
 

@@ -36,6 +36,8 @@ DATA.mkdir(parents=True, exist_ok=True)
 CONFIG = tomllib.loads((HERE / "feeds.toml").read_text())
 SHOWN_LOG = DATA / "shown.jsonl"
 CLICKS_LOG = DATA / "clicks.jsonl"
+ARCHIVE_LIMIT = 5
+HAM_QUESTION_COUNT = 5
 
 STOPWORDS = set("""this that with from have will your what when they them then
 were been more over which their there about after into just says said could
@@ -143,20 +145,51 @@ def econ_line():
     return " · ".join(out[:3])
 
 
-def ham_question():
-    """One Technician-pool question per day, answer behind a click."""
+def ham_questions():
+    """Five deterministic daily Technician questions with click-through tabs."""
     f = HERE / "tech_pool.json"
     if not f.exists():
         return ""
     qs = json.loads(f.read_text())
-    q = qs[datetime.now().date().toordinal() % len(qs)]
-    choices = "".join(f"<br><b>{k}.</b> {html.escape(v)}"
-                      for k, v in sorted(q["choices"].items()))
-    return (f'<div class="paper"><b>📻 HAM QUESTION OF THE DAY</b> '
-            f'<span class="meta">{q["id"]} · 2026–2030 Technician pool</span><br>'
-            f'{html.escape(q["q"])}{choices}'
-            f'<details><summary>Answer</summary><b>{q["answer"]}.</b> '
-            f'{html.escape(q["choices"][q["answer"]])}</details></div>')
+    if not qs:
+        return ""
+    count = min(HAM_QUESTION_COUNT, len(qs))
+    start = (datetime.now().date().toordinal() * count) % len(qs)
+    daily = [qs[(start + offset) % len(qs)] for offset in range(count)]
+
+    radios = "".join(
+        f'<input class="ham-radio" type="radio" name="ham-question" '
+        f'id="ham-question-{n}"{" checked" if n == 1 else ""}>'
+        for n in range(1, count + 1)
+    )
+    tabs = "".join(
+        f'<label for="ham-question-{n}" title="Show question {n}">{n}</label>'
+        for n in range(1, count + 1)
+    )
+    slides = []
+    for n, q in enumerate(daily, 1):
+        choices = "".join(
+            f'<div><b>{html.escape(k)}.</b> {html.escape(v)}</div>'
+            for k, v in sorted(q["choices"].items())
+        )
+        answer = q["answer"]
+        slides.append(
+            f'<section class="ham-question"><span class="meta">QUESTION {n} OF {count} '
+            f'· {html.escape(q["id"])} · 2026–2030 Technician pool</span>'
+            f'<p>{html.escape(q["q"])}</p><div class="ham-choices">{choices}</div>'
+            f'<details><summary>Show answer</summary><b>{html.escape(answer)}.</b> '
+            f'{html.escape(q["choices"][answer])}</details></section>'
+        )
+    return (f'<div class="paper ham"><b>📻 5 HAM QUESTIONS OF THE DAY</b>'
+            f'{radios}<div class="ham-nav">{tabs}</div>'
+            f'<div class="ham-slides">{"".join(slides)}</div></div>')
+
+
+def prune_archives(archive, keep=ARCHIVE_LIMIT):
+    """Delete old generated editions, retaining only the newest ``keep``."""
+    files = sorted(archive.glob("*.html"), reverse=True)
+    for old in files[keep:]:
+        old.unlink()
 
 
 # ---------------------------------------------------------------- collection
@@ -379,6 +412,27 @@ def render(picked, paper, web):
   .paper a {{ color: inherit; }}
   .paper details {{ margin-top: 0.4rem; }}
   .paper summary {{ cursor: pointer; color: #444; }}
+  .ham {{ position: relative; }}
+  .ham-radio {{ position: absolute; opacity: 0; pointer-events: none; }}
+  .ham-nav {{ display: flex; justify-content: center; gap: 0.4rem;
+              margin: 0.6rem 0; }}
+  .ham-nav label {{ border: 1px solid gray; border-radius: 50%; cursor: pointer;
+                    width: 1.7rem; line-height: 1.7rem; text-align: center; }}
+  .ham-question {{ display: none; text-align: left; }}
+  .ham-question p {{ margin: 0.5rem 0; }}
+  .ham-choices div {{ margin: 0.2rem 0; }}
+  #ham-question-1:checked ~ .ham-nav label[for="ham-question-1"],
+  #ham-question-2:checked ~ .ham-nav label[for="ham-question-2"],
+  #ham-question-3:checked ~ .ham-nav label[for="ham-question-3"],
+  #ham-question-4:checked ~ .ham-nav label[for="ham-question-4"],
+  #ham-question-5:checked ~ .ham-nav label[for="ham-question-5"] {{
+    background: currentColor; color: Canvas; font-weight: bold;
+  }}
+  #ham-question-1:checked ~ .ham-slides .ham-question:nth-child(1),
+  #ham-question-2:checked ~ .ham-slides .ham-question:nth-child(2),
+  #ham-question-3:checked ~ .ham-slides .ham-question:nth-child(3),
+  #ham-question-4:checked ~ .ham-slides .ham-question:nth-child(4),
+  #ham-question-5:checked ~ .ham-slides .ham-question:nth-child(5) {{ display: block; }}
   @media (prefers-color-scheme: dark) {{ .paper summary {{ color: #bbb; }} }}
   footer {{ margin: 2rem 0 1rem; color: #444; font-size: 0.85rem;
             border-top: 1px solid gray; padding-top: 1rem; }}
@@ -392,7 +446,7 @@ def render(picked, paper, web):
 <span class="meta">{html.escape(lead["source"])}</span></div>
 <hr>
 {paper_html}
-{ham_question()}
+{ham_questions()}
 <div class="cols">
 {body}
 </div>
@@ -459,6 +513,7 @@ def main():
     archive = DATA / "archive"
     archive.mkdir(exist_ok=True)
     (archive / datetime.now().strftime("%Y-%m-%d-%H%M.html")).write_text(page)
+    prune_archives(archive)
     print(f"Wrote {out} ({len(picked)} items from {len(items)} candidates)")
     if "--no-open" not in sys.argv:
         webbrowser.open(out.as_uri())

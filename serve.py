@@ -63,7 +63,7 @@ class Handler(BaseHTTPRequestHandler):
         elif url.path == "/archive/":
             files = sorted((DATA / "archive").glob("*.html"), reverse=True)
             rows = "\n".join(f'<p><a href="/archive/{f.name}">{f.stem}</a></p>'
-                             for f in files[:200])
+                             for f in files[:5])
             self._send(200, "<!doctype html><title>archive</title>"
                             "<body style='font-family:serif;max-width:30rem;"
                             f"margin:2rem auto'><h1>Past editions</h1>{rows}")
