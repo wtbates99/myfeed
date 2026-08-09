@@ -19,7 +19,7 @@ from urllib.parse import parse_qs, urlparse
 HERE = Path(__file__).parent
 DATA = Path(os.environ.get("MYFEED_DATA", HERE))
 CLICKS_LOG = DATA / "clicks.jsonl"
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8484
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 8484
 BIND = os.environ.get("MYFEED_BIND", "127.0.0.1")
 
 
@@ -36,7 +36,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         url = urlparse(self.path)
-        if url.path == "/":
+        if url.path == "/health/live":
+            self._send(200, '{"status":"ok"}', "application/json")
+        elif url.path == "/health/ready":
+            digest = DATA / "digest.html"
+            code = 200 if digest.is_file() else 503
+            self._send(code, json.dumps({"status": "ready" if code == 200 else "waiting"}), "application/json")
+        elif url.path == "/":
             f = DATA / "digest.html"
             if f.exists():
                 self._send(200, f.read_bytes(), extra={"Cache-Control": "no-cache"})
