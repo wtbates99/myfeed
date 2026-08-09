@@ -1,84 +1,107 @@
 # myfeed
 
-A personal, finite news digest. One script, one config file, no accounts,
-no algorithm feeding you rage, no infinite scroll — the page literally ends.
+**A finite, self-hosted news digest with transparent scoring and no infinite scroll.**
 
-I got tired of Google/Apple News missing what I care about and Reddit/X/YouTube
-eating my time, so this pulls the RSS feeds I actually want, scores every
-headline against my interests, and renders the top ~18 items from the last
-48 hours as a plain HTML page. Read it with coffee, close the tab, done.
+[![Python](https://img.shields.io/badge/python-3.x-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/self--hosted-Docker-2496ED?logo=docker&logoColor=white)](Dockerfile)
+[![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial-c9a84c)](LICENSE)
 
-## Usage
+![A generated myfeed digest with ranked stories, market context, and a finite page](docs/assets/digest.png)
 
-Requires [uv](https://docs.astral.sh/uv/) — the script declares its own
-dependency (feedparser) inline.
+`myfeed` pulls the RSS feeds you choose, scores recent headlines against your
+interests, and renders roughly 18 links into one plain HTML page. Read it,
+close it, and get on with the day.
 
-```sh
-./digest.py            # fetch, rank, write digest.html, open in browser
-./digest.py --no-open  # just write the file
+## Why it exists
+
+- **Finite by design** — a hard item cap and freshness window make the page end.
+- **User-controlled sources** — RSS and Atom feeds live in one configuration file.
+- **Transparent ranking** — source weight, keyword matches, and age determine the score.
+- **No accounts** — the local script does not need a platform identity.
+- **Self-hostable** — generate a static file or run the included container and server.
+- **Graceful degradation** — optional market, sports, and paper sources disappear cleanly when unavailable.
+
+## Run locally
+
+Requires [uv](https://docs.astral.sh/uv/). The executable script declares its
+Python dependency inline.
+
+```bash
+git clone https://github.com/wtbates99/myfeed.git
+cd myfeed
+
+./digest.py            # generate digest.html and open it
+./digest.py --no-open  # generate only
 ```
 
-Besides the ranked links, the page carries a market ticker (S&P, Nasdaq,
-Dow, 10-yr, BTC via Yahoo's chart API), your teams' records and next games
-(ESPN's public API), and a pinned "paper of the week" — the best-scoring
-arXiv paper of the past 7 days, cached in `paper.json` since arXiv's RSS
-only carries each day's announcements. All of it degrades gracefully:
-if an API is down, that line just doesn't render.
+Edit `feeds.toml` before treating the output as your feed. The repository's
+configuration is an example of one person's interests, not a universal ranking.
 
-## Deployment
+## Ranking model
 
-Production runs as a Docker container (see `Dockerfile` + `entrypoint.sh`):
-the entrypoint regenerates the digest every 3 hours and `serve.py` serves it,
-logging clicks to a mounted `/data` volume. Pushes to `main` build
-`ghcr.io/wtbates99/myfeed:latest` via GitHub Actions; watchtower redeploys it,
-and Cloudflare Tunnel routes news.palanbates.com to the container.
+The score is intentionally understandable:
 
-`serve.py` routes: `/` the digest · `/go` click-logging redirect (feeds the
-learned ranker) · `/archive/` the five most recent editions · `/robots.txt`
-says go away. Digest generation prunes older archive pages to save disk space.
-
-Alternatively, run it bare on a systemd user timer:
-
-```ini
-# ~/.config/systemd/user/myfeed.service
-[Unit]
-Description=Regenerate myfeed digest
-After=network-online.target
-[Service]
-Type=oneshot
-Environment=PATH=%h/.local/bin:/usr/bin:/bin
-ExecStart=%h/myfeed/digest.py --no-open
-
-# ~/.config/systemd/user/myfeed.timer
-[Unit]
-Description=Regenerate myfeed digest every 3 hours
-[Timer]
-OnCalendar=*-*-* 00/3:00:00
-Persistent=true
-[Install]
-WantedBy=timers.target
+```text
+source weight + boost keyword hits - bury keyword hits - age / 12 hours
 ```
 
-```sh
-systemctl --user daemon-reload && systemctl --user enable --now myfeed.timer
+Configuration controls:
+
+- `[[source]]` defines a feed, topic, and source weight.
+- `boost` contains terms that add two points per match.
+- `bury` contains terms that subtract five points per match.
+- `max_items` caps the digest.
+- `max_age_hours` sets the freshness window.
+
+Each active topic can receive a slot when it has a sufficiently strong item;
+quiet topics are not padded with stale filler.
+
+## Optional context
+
+The rendered page can include:
+
+- major-market and Bitcoin snapshots;
+- configured team records and upcoming games;
+- a cached arXiv paper of the week;
+- five recent archived editions;
+- local click counts that can inform future ranking.
+
+These integrations use third-party endpoints and may change independently.
+Failures do not prevent the core RSS digest from rendering.
+
+## Docker deployment
+
+```bash
+docker build -t myfeed:local .
+docker run --rm -p 8484:8484 -v myfeed-data:/data myfeed:local
 ```
 
-## How it works
+The container regenerates the digest every three hours. `serve.py` serves `/`,
+the recent archive, and a click-logging redirect backed by the mounted data
+volume.
 
-Everything lives in `feeds.toml`:
+## Privacy and operational notes
 
-- **`[[source]]`** — RSS/Atom feeds, each with a `topic` (for grouping) and a
-  `weight` (per-source score bump). Negative weights are useful for firehoses:
-  the arXiv cs.LG feed is wired in at `weight = -1`, so papers only surface
-  when their titles hit boost keywords.
-- **`boost`** — keywords that raise a headline's score (+2 each). This is the
-  personalization dial: your teams, your stack, your genres.
-- **`bury`** — keywords that sink a headline (−5 each). Clickbait, betting
-  odds, "best CD rates today" filler.
-- **`max_items` / `max_age_hours`** — the hard cap and freshness window.
+- Feed requests reveal the server's IP address to the configured publishers.
+- Optional market, sports, and paper requests contact their respective providers.
+- Click history remains in the configured local or mounted data directory.
+- The generated digest contains live third-party headlines; do not commit it.
+- README screenshots use the repository's example configuration and contain no click history.
 
-Scoring is transparent: `source weight + boost hits − bury hits − age/12h`.
-Each topic gets at least one slot if it has something scoring well; quiet
-topics just sit out rather than forcing stale filler.
+## Validation
 
-Fork it, gut my `feeds.toml`, put your own obsessions in.
+```bash
+python -m py_compile digest.py serve.py
+./digest.py --no-open
+python serve.py 8484
+```
+
+Open <http://127.0.0.1:8484> and verify the digest, archive, redirect, and
+fallback behavior.
+
+## License
+
+`myfeed` is **source available** under the
+[PolyForm Noncommercial License 1.0.0](LICENSE). Personal and noncommercial
+use is permitted under those terms. Commercial use requires a
+[separate license](COMMERCIAL-LICENSE.md).
